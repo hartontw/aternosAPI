@@ -2,9 +2,15 @@
   "name": "aternosapi",
   "version": "0.0.1",
   "description": "Non Official Aternos API written in Node.js",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "rest": "node src/index.js --rest",
+    "start": "node src/index.js --start",
+    "start-wait": "node src/index.js --start --wait",
+    "stop": "node src/index.js --stop",
+    "restart": "node src/index.js --stop",
+    "state": "node src/index.js --state",
+    "gamedig": "node src/index.js --gamedig",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -17,6 +23,11 @@
   "author": "Daniel 'Harton' Martínez",
   "license": "ISC",
   "dependencies": {
-    "puppeteer": "^5.3.0"
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "gamedig": "^2.0.23",
+    "jsonwebtoken": "^8.5.1",
+    "puppeteer": "^5.3.0",
+    "yargs": "^16.0.3"
   }
 }
