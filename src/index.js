@@ -15,7 +15,7 @@ async function getGamedig(id) {
         return await Gamedig.query({ type: 'minecraft', host });
     }
     catch (error) {
-        return { error };
+        return { error: error.message };
     }
 }
 
@@ -34,8 +34,8 @@ else if (argv.restart) {
         .then(console.log)
         .catch(console.error);
 }
-else if (argv.state) {
-    aternos.getState(argv.id)
+else if (argv.info) {    
+    aternos.getInfo(argv.id)
         .then(console.log)
         .catch(console.error);
 }
@@ -55,75 +55,78 @@ else if (argv.rest) {
         console.log(`${process.env.HOST_NAME || 'localhost'}:${process.env.PORT || 3000}`);
     });
 
-    app.get('/', (req, res) => {
+    app.get('/api', (req, res) => {
         res.json({
-            ['/']: {
+            ['/api']: {
                 get: 'This response'
             },
-            ['/login']: {
+            ['/api/login']: {
                 post: 'Raw token',
                 body: {
                     password: 'api_password'
                 }
             },
-            ['/start']: {
+            ['/api/start']: {
                 post: 'Try to start the server',
-                params: {
+                query: {
                     id: 'id or name of the server, none for the first',
                     wait: 'wait for queue end and start, default false'
                 },
                 examples: [
-                    'http://example.org/start?id=myserver&wait=true',
-                    'http://example.org/start?id=ZXXasMBsEHXhFJ2L',
-                    'http://example.org/start?wait=true',
-                    'http://example.org/start'
+                    'http://example.org/api/start?id=myserver&wait=true',
+                    'http://example.org/api/start?id=#ZXXasMBsEHXhFJ2L',
+                    'http://example.org/api/start?wait=true',
+                    'http://example.org/api/start'
                 ]
             },
-            ['/stop']: {
+            ['/api/stop']: {
                 post: 'Try to stop the server',
-                params: {
+                query: {
                     id: 'id or name of the server, none for the first'
                 },
                 examples: [
-                    'http://example.org/stop?id=myserver',
-                    'http://example.org/stop?id=ZXXasMBsEHXhFJ2L',
-                    'http://example.org/stop'
+                    'http://example.org/api/stop?id=myserver',
+                    'http://example.org/api/stop?id=#ZXXasMBsEHXhFJ2L',
+                    'http://example.org/api/stop'
                 ]
             },
-            ['/restart']: {
+            ['/api/restart']: {
                 post: 'Try to restart the server',
-                params: {
+                query: {
                     id: 'id or name of the server, none for the first'
                 },
                 examples: [
-                    'http://example.org/restart?id=myserver',
-                    'http://example.org/restart?id=ZXXasMBsEHXhFJ2L',
-                    'http://example.org/restart'
+                    'http://example.org/api/restart?id=myserver',
+                    'http://example.org/api/restart?id=#ZXXasMBsEHXhFJ2L',
+                    'http://example.org/api/restart'
                 ]
             },
-            ['/state']: {
-                get: 'Get the current state of the server included queue time and position',
-                params: {
+            ['/api/info']: {
+                get: 'Get the info of the server included queue time and position',
+                query: {
                     id: 'id or name of the server, none for the first'
                 },
                 examples: [
-                    'http://example.org/state?id=myserver',
-                    'http://example.org/state?id=ZXXasMBsEHXhFJ2L',
-                    'http://example.org/state'
+                    'http://example.org/api/info?id=myserver',
+                    'http://example.org/api/info?id=#ZXXasMBsEHXhFJ2L',
+                    'http://example.org/api/info'
                 ]
             },
-            ['/gamedig']: {
+            ['/api/gamedig']: {
                 get: 'Get GameDig json for Minecraft',
-                params: {
-
+                query: {
+                    id: 'id or name of the server, none for the first'
                 },
                 examples: [
+                    'http://example.org/api/gamedig?id=myserver',
+                    'http://example.org/api/gamedig?id=#ZXXasMBsEHXhFJ2L',
+                    'http://example.org/api/gamedig'
                 ]
             }
         });
     })
 
-    app.post('/login', (req, res) => {
+    app.post('/api/login', (req, res) => {
         const auth = sign(req);
         if (!auth) {
             res.status(401).json({
@@ -136,45 +139,45 @@ else if (argv.rest) {
         }
     });
 
-    app.post('/start', authorized, async (req, res) => {
+    app.post('/api/start', authStart, async (req, res) => {
         try {
-            res.json(await aternos.start(req.params.id, req.params.wait));
+            res.json(await aternos.start(req.query.id, req.query.wait));            
         }
         catch (error) {
             res.json({ error });
         }
     })
 
-    app.post('/stop', authorized, async (req, res) => {
+    app.post('/api/stop', authorized, async (req, res) => {
         try {
-            res.json(await aternos.stop(req.params.id));
+            res.json(await aternos.stop(req.query.id));
         }
         catch (error) {
             res.json({ error });
         }
     })
 
-    app.post('/restart', authorized, async (req, res) => {
+    app.post('/api/restart', authorized, async (req, res) => {
         try {
-            res.json(await aternos.restart(req.params.id));
+            res.json(await aternos.restart(req.query.id));
         }
         catch (error) {
             res.json({ error });
         }
     })
 
-    app.post('/state', authorized, async (req, res) => {
+    app.get('/api/info', authInfo, async (req, res) => {
         try {
-            res.json(await aternos.start(req.params.id));
+            res.json(await aternos.getInfo(req.query.id));
         }
         catch (error) {
             res.json({ error });
         }
     })
 
-    app.post('/gamedig', authorized, async (req, res) => {
+    app.get('/api/gamedig', authInfo, async (req, res) => {
         try {
-            res.json(await getGamedig({id:req.params.id, host:req.params.host}));
+            res.json(await getGamedig(id));
         }
         catch (error) {
             res.json({ error });
@@ -190,6 +193,24 @@ else if (argv.rest) {
         }
         else {
             return { auth: true };
+        }
+    }
+
+    function authStart(req, res, next) {
+        if (process.env.PUBLIC_START) {
+            next();            
+        }
+        else {            
+            authorized(req, res, next);
+        }
+    }
+
+    function authInfo(req, res, next) {
+        if (process.env.PUBLIC_INFO) {
+            next();
+        }
+        else {            
+            authorized(req, res, next);
         }
     }
 
@@ -221,9 +242,9 @@ else {
             "start-wait": "node src/index.js --start --wait",
             "stop": "node src/index.js --stop",
             "restart": "node src/index.js --stop",
-            "state": "node src/index.js --state",
+            "info": "node src/index.js --info",
             "gamedig": "node src/index.js --gamedig",
           },
-        "usage": "--[rest, start [--wait], stop, restart, state, gamedig] [--id=<server id or name>]"
+        "usage": "--[rest, start [--wait], stop, restart, info, gamedig] [--id=<server id or name>]"
     });
 }

@@ -26,14 +26,18 @@ HOST_NAME=localhost
 PORT=3000
 API_PASSWORD=strong_password
 TOKEN_KEY=vulnerable_token_key
+PUBLIC_START=false
+PUBLIC_INFO=false
 ```
 
-- **ATERNOS_USER**: required
-- **ATERNOS_PASSWORD**: required
-- **HOST_NAME**: for rest mode only, default "localhost"
-- **PORT**: for rest mode only, default "3000"
-- **API_PASSWORD**: for rest mode only, **if not set API is public**
-- **TOKEN_KEY**: for rest private mode only, default "vulnerable_token_key"
+- **ATERNOS_USER**: Required. Aternos account user.
+- **ATERNOS_PASSWORD**: Required. Aternos account password.
+- **HOST_NAME**: Rest mode only. IP or Hostname of the API. Default "localhost".
+- **PORT**: Rest mode only. Port of the API. Default "3000".
+- **API_PASSWORD**: Rest mode only. Required password for get the Token. **If not set, entire API is public**.
+- **TOKEN_KEY**: Rest auth mode only. Access Token for access. Default "vulnerable_token_key".
+- **PUBLIC_START**: Rest auth mode only. Disable auth for Start route only. If server is started, this route do nothing. Default "false".
+- **PUBLIC_INFO**: Rest auth mode only. Disable auth for Info and Gamedig. Default "false".
 
 ### Usage
 
@@ -44,7 +48,7 @@ npm run start #starts the server
 npm run start-wait #starts the server and wait the queue for confirm
 npm run stop #stop the server
 npm run restart #restart the server
-npm run state #get the name, state and queue
+npm run info #get the name, info and queue
 npm run gamedig #get gamedig complete info
 ```
 
@@ -54,7 +58,7 @@ npm run start -- --id=myserver
 ```
 or full usage:
 ```bash
-node src/index.js --[rest, start [--wait], stop, restart, state, gamedig] [--id=<server id or name>]
+node src/index.js --[rest, start [--wait], stop, restart, info, gamedig] [--id=<server id or name>]
 ```
 
 ### Rest API

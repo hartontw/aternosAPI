@@ -9,7 +9,7 @@
     "start-wait": "node src/index.js --start --wait",
     "stop": "node src/index.js --stop",
     "restart": "node src/index.js --stop",
-    "state": "node src/index.js --state",
+    "info": "node src/index.js --info",
     "gamedig": "node src/index.js --gamedig",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
