@@ -2,6 +2,8 @@
 
 Non Official [Aternos](https://aternos.org) API written in Node.js
 
+Aternos is a legitimate corporation and its benefits comes with ads in the web page. Please use it with responsibility.
+
 ### Installation
 
 ```bash
@@ -28,6 +30,7 @@ API_PASSWORD=strong_password
 TOKEN_KEY=vulnerable_token_key
 PUBLIC_START=false
 PUBLIC_INFO=false
+DEBUG=false
 ```
 
 - **ATERNOS_USER**: Required. Aternos account user.
@@ -38,6 +41,7 @@ PUBLIC_INFO=false
 - **TOKEN_KEY**: Rest auth mode only. Access Token for access. Default "vulnerable_token_key".
 - **PUBLIC_START**: Rest auth mode only. Disable auth for Start route only. If server is started, this route do nothing. Default "false".
 - **PUBLIC_INFO**: Rest auth mode only. Disable auth for Info and Gamedig. Default "false".
+- **DEBUG**: If true show browser navigation. Defaul "false".
 
 ### Usage
 

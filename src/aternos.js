@@ -1,5 +1,7 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const ph = require('./puppeteer-helper');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 
 const hostname = 'https://aternos.org';
 
@@ -15,6 +17,9 @@ const si = {
     waiting: 'div.statuslabel i.fas.fa-clock',
     loading: 'div.statuslabel i.fas.fa-spinner-third'
 };
+
+puppeteer.use(StealthPlugin());
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 async function findServer(page, id) {
     let server = id && await page.$(`[data-id="${id}"]`);
@@ -120,13 +125,20 @@ async function getServerInfo(page) {
     return info;
 }
 
+function sleep(ms) {
+    return new Promise( resolve => {
+        setTimeout(() => resolve(), ms);
+    });
+}
+
 async function connect(id, req) {
     const startPage = hostname + '/go';
 
     let browser, info, time = new Date();
 
     try {            
-        browser = await puppeteer.launch({headless:true});            
+        const headless = process.env.DEBUG ? !process.env.DEBUG : true;
+        browser = await puppeteer.launch({headless});
         
         const page = await browser.newPage();
         await page.setViewport({ width: 1920, height: 1080});
@@ -152,13 +164,17 @@ async function connect(id, req) {
             throw `Server ${id} not found`;
         }
 
-        await server.click();
-        await page.waitForNavigation({ waitUntil: 'networkidle0' });
+        await server.click();        
+        await page.waitForNavigation({ waitUntil: 'networkidle0' });        
 
         const choices = await page.$('#accept-choices');
         if (choices) {
             await choices.click();
         }
+
+        await page.waitForSelector('div.btn.btn-white');
+        await page.click('div.btn.btn-white');
+        await page.waitForSelector('div.btn.btn-white i.far.fa-sad-tear', { hidden:true, timeout:to.default });
 
         info = await getServerInfo(page);
 
@@ -185,15 +201,18 @@ function start(id, wait) {
         }
     
         try {
+            await page.waitForSelector('#start');
             await page.click('#start');
-            await page.waitForTimeout(1000);
-    
-            await page.waitForSelector('a.btn.btn-green', {timeout:to.default});
-            let confirmation = await page.$('a.btn.btn-green');
+            await page.waitForTimeout(1000);            
+
+            
+            const confirmStart = 'div.alert-buttons.btn-group a.btn.btn-green';    
+            await page.waitForSelector(confirmStart, {timeout:to.default});
+            let confirmation = await page.$(confirmStart);
             if (confirmation) {
                 await confirmation.click();
                 await page.waitForTimeout(1000);
-            }            
+            }
 
             if (!page.url().includes('server')) {
                 await page.goto(hostname+'/server');
