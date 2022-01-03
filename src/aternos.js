@@ -125,12 +125,6 @@ async function getServerInfo(page) {
     return info;
 }
 
-function sleep(ms) {
-    return new Promise( resolve => {
-        setTimeout(() => resolve(), ms);
-    });
-}
-
 async function connect(id, req) {
     const startPage = hostname + '/go';
 
@@ -164,8 +158,8 @@ async function connect(id, req) {
             throw `Server ${id} not found`;
         }
 
-        await server.click();        
-        await page.waitForNavigation({ waitUntil: 'networkidle0' });        
+        await server.click();
+        await page.waitForNavigation({ waitUntil: 'networkidle0' });
 
         const choices = await page.$('#accept-choices');
         if (choices) {
